@@ -1,0 +1,20 @@
+{
+    "name": "moodlehq/behat-extension",
+    "description": "Moodle behat extension",
+    "keywords": ["BDD", "Behat", "Moodle"],
+    "type": "library",
+    "license": "",
+    "authors": [
+        {
+            "name": "David Monllaó",
+            "email": "david.monllao@gmail.com",
+            "homepage": "http://moodle.com",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "Moodle\\BehatExtension": "src/"
+        }
+    }
+}
