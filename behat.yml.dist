@@ -1,0 +1,4 @@
+default:
+  extensions:
+    Moodle\BehatExtension:
+      host: ~
