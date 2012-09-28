@@ -29,8 +29,8 @@ class Extension implements ExtensionInterface
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/services'));
         $loader->load('core.xml');
 
-        if (isset($config['wwwroot'])) {
-            $container->setParameter('behat.moodle.wwwroot', rtrim($config['wwwroot'], '/'));
+        if (isset($config['config_file_path'])) {
+            $container->setParameter('behat.moodle.config_file_path', rtrim($config['config_file_path'], '/'));
         }
     }
 
@@ -43,7 +43,7 @@ class Extension implements ExtensionInterface
     {
         $builder->
             children()->
-                scalarNode('wwwroot')->
+                scalarNode('config_file_path')->
                     defaultNull()->
                 end()->
             end()->
