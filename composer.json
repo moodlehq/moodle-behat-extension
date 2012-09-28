@@ -1,7 +1,7 @@
 {
     "name": "moodlehq/behat-extension",
     "description": "Moodle behat extension",
-    "keywords": ["BDD", "Behat", "Moodle"],
+    "keywords": ["Moodle", "BDD", "Behat"],
     "type": "library",
     "license": "",
     "authors": [
