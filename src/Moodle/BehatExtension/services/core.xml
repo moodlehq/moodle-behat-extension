@@ -5,6 +5,13 @@
 
     <parameters>
         <parameter key="behat.moodle.config_file_path"></parameter>
-        <parameter key="gherkin.loader.feature_suite.class">Moodle\BehatExtension\Gherkin\Loader\MoodleFeaturesSuiteLoader</parameter>
+        <parameter key="gherkin.class">Moodle\BehatExtension\Gherkin\MoodleGherkin</parameter>
     </parameters>
+    <services>
+
+        <!-- Overwritting Gherkin service passing moodle config path -->
+        <service id="gherkin" class="%gherkin.class%">
+            <argument>%behat.moodle.config_file_path%</argument>
+        </service>
+    </services>
 </container>
