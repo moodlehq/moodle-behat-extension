@@ -10,7 +10,8 @@ use Behat\Gherkin\Gherkin,
  *
  * Moodle has multiple features folders across all Moodle
  * components (including 3rd party plugins) this extension loads
- * a file from Moodle codebase describing the available features
+ * a YAML file from Moodle codebase describing the available
+ * components with features
  *
  * @uses      Symfony\Component\Yaml\Yaml
  * @author    David Monllaó <david.monllao@gmail.com>
@@ -26,10 +27,7 @@ class MoodleGherkin extends Gherkin
     protected $moodleConfig;
 
     /**
-     * Loads and parses the specified Moodle config file
-     *
-     * Moodle\BehatExtension\Extension:
-     *   config_file_path: /I/am/the/file/path
+     * Loads and parses the Moodle config file
      *
      * @param string  $moodleConfigPath
      */
@@ -39,7 +37,7 @@ class MoodleGherkin extends Gherkin
     }
 
     /**
-     * Multiple features folders loading
+     * Multiple features folders loader
      *
      * Delegates load execution to parent including filters management
      *
@@ -50,11 +48,14 @@ class MoodleGherkin extends Gherkin
     public function load($resource, array $filters = array())
     {
 
-        // Get moodle features and
-        $moodledata = Yaml::parse($this->moodleConfigPath);
+        // If a resource is specified don't overwrite the parent behaviour.
+        if ($resource != '') {
+            return parent::load($resource, $filters);
+        }
 
+        // Loads all the features files of each Moodle component.
         $features = array();
-        foreach ($moodledata['features'] as $path) {
+        foreach ($this->moodleConfig['features'] as $path) {
             $features = array_merge($features, parent::load($path, $filters));
         }
         return $features;

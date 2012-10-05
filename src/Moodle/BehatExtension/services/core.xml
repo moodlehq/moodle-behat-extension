@@ -6,8 +6,15 @@
     <parameters>
         <parameter key="behat.moodle.config_file_path"></parameter>
         <parameter key="gherkin.class">Moodle\BehatExtension\Gherkin\MoodleGherkin</parameter>
+        <parameter key="moodle.context.initializer.class">Moodle\BehatExtension\Context\Initializer\MoodleAwareInitializer</parameter>
     </parameters>
     <services>
+
+        <!-- Moodle context initializer -->
+        <service id="moodle.context.initializer" class="%moodle.context.initializer.class%">
+            <argument>%behat.moodle.config_file_path%</argument>
+            <tag name="behat.context.initializer" />
+        </service>
 
         <!-- Overwritting Gherkin service passing moodle config path -->
         <service id="gherkin" class="%gherkin.class%">
