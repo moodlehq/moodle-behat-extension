@@ -30,10 +30,12 @@ class MoodleContext extends BehatContext
         $this->moodleConfig = Yaml::parse($configFilePath);
 
         // Using the key as context identifier.
-        foreach ($this->moodleConfig['steps_definitions'] as $componentname => $path) {
-            $classname = 'behat_' . $componentname;
-            require_once($path . '/' . $classname . '.php');
-            $this->useContext($componentname, new $classname());
+        if (!empty($this->moodleConfig['steps_definitions']) && $this->moodleConfig['steps_definitions'] != '/') {
+            foreach ($this->moodleConfig['steps_definitions'] as $componentname => $path) {
+                $classname = 'behat_' . $componentname;
+                require_once($path . '/' . $classname . '.php');
+                $this->useContext($componentname, new $classname());
+            }
         }
     }
 }

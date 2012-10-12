@@ -55,8 +55,10 @@ class MoodleGherkin extends Gherkin
 
         // Loads all the features files of each Moodle component.
         $features = array();
-        foreach ($this->moodleConfig['features'] as $path) {
-            $features = array_merge($features, parent::load($path, $filters));
+        if (!empty($thi->moodleConfig['features'])) {
+            foreach ($this->moodleConfig['features'] as $path) {
+                $features = array_merge($features, parent::load($path, $filters));
+            }
         }
         return $features;
     }
