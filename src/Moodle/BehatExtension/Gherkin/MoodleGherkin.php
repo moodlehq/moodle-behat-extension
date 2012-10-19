@@ -53,6 +53,10 @@ class MoodleGherkin extends Gherkin
             return parent::load($resource, $filters);
         }
 
+        if (!is_array($this->moodleConfig)) {
+            throw new RuntimeException('The moodledata config.yml file can not be read by behat, ensure that you specified it\'s path in behat.yml');
+        }
+
         // Loads all the features files of each Moodle component.
         $features = array();
         if (!empty($this->moodleConfig['features'])) {

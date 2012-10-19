@@ -29,12 +29,18 @@ class MoodleContext extends BehatContext
     {
         $this->moodleConfig = Yaml::parse($configFilePath);
 
+        if (!is_array($this->moodleConfig)) {
+            throw new RuntimeException('The moodledata config.yml file can not be read by behat, ensure that you specified it\'s path in behat.yml');
+        }
+
         // Using the key as context identifier.
-        if (!empty($this->moodleConfig['steps_definitions']) && $this->moodleConfig['steps_definitions'] != '/') {
+        if (!empty($this->moodleConfig['steps_definitions'])) {
             foreach ($this->moodleConfig['steps_definitions'] as $componentname => $path) {
                 $classname = 'behat_' . $componentname;
-                require_once($path . '/' . $classname . '.php');
-                $this->useContext($componentname, new $classname());
+                if (file_exists($path . '/' . $classname . '.php')) {
+                    require_once($path . '/' . $classname . '.php');
+                    $this->useContext($componentname, new $classname());
+                }
             }
         }
     }
