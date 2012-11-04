@@ -29,9 +29,7 @@ class Extension implements ExtensionInterface
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/services'));
         $loader->load('core.xml');
 
-        if (isset($config['config_file_path'])) {
-            $container->setParameter('behat.moodle.config_file_path', rtrim($config['config_file_path'], '/'));
-        }
+        $container->setParameter('behat.moodle.parameters', $config);
     }
 
     /**
@@ -43,8 +41,13 @@ class Extension implements ExtensionInterface
     {
         $builder->
             children()->
-                scalarNode('config_file_path')->
-                    defaultNull()->
+                arrayNode('features')->
+                    useAttributeAsKey('key')->
+                    prototype('variable')->end()->
+                end()->
+                arrayNode('steps_definitions')->
+                    useAttributeAsKey('key')->
+                    prototype('variable')->end()->
                 end()->
             end()->
         end();

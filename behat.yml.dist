@@ -1,4 +1,0 @@
-default:
-  extensions:
-    Moodle\BehatExtension:
-      config_file_path: ~

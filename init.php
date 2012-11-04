@@ -17,4 +17,4 @@ spl_autoload_register(function($class) {
     }
 }, true, false);
 
-return new Moodle\BehatExtension;
+return new Moodle\BehatExtension\Extension;

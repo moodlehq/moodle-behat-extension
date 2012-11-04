@@ -14,14 +14,11 @@ use Moodle\BehatExtension\Context\MoodleContext,
  */
 class MoodleAwareInitializer implements InitializerInterface
 {
-    private $config_file_path;
+    private $parameters;
 
-    /**
-     * @param string $config_file_path
-     */
-    public function __construct($configFilePath)
+    public function __construct(array $parameters)
     {
-        $this->config_file_path = $configFilePath;
+        $this->parameters = $parameters;
     }
 
     /**
@@ -34,12 +31,12 @@ class MoodleAwareInitializer implements InitializerInterface
     }
 
     /**
-     * Passes the Moodle config file path to the main Moodle context
+     * Passes the Moodle config to the main Moodle context
      * @see Behat\Behat\Context\Initializer.InitializerInterface::initialize()
      * @param ContextInterface $context
      */
     public function initialize(ContextInterface $context)
     {
-        $context->setMoodleConfig($this->config_file_path);
+        $context->setMoodleConfig($this->parameters);
     }
 }

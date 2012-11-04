@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="behat.moodle.config_file_path"></parameter>
+        <parameter key="behat.moodle.parameters"></parameter>
         <parameter key="gherkin.class">Moodle\BehatExtension\Gherkin\MoodleGherkin</parameter>
         <parameter key="moodle.context.initializer.class">Moodle\BehatExtension\Context\Initializer\MoodleAwareInitializer</parameter>
     </parameters>
@@ -12,13 +12,13 @@
 
         <!-- Moodle context initializer -->
         <service id="moodle.context.initializer" class="%moodle.context.initializer.class%">
-            <argument>%behat.moodle.config_file_path%</argument>
+            <argument>%behat.moodle.parameters%</argument>
             <tag name="behat.context.initializer" />
         </service>
 
         <!-- Overwritting Gherkin service passing moodle config path -->
         <service id="gherkin" class="%gherkin.class%">
-            <argument>%behat.moodle.config_file_path%</argument>
+            <argument>%behat.moodle.parameters%</argument>
         </service>
     </services>
 </container>

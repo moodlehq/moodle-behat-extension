@@ -10,10 +10,8 @@ use Behat\Gherkin\Gherkin,
  *
  * Moodle has multiple features folders across all Moodle
  * components (including 3rd party plugins) this extension loads
- * a YAML file from Moodle codebase describing the available
- * components with features
+ * the available features
  *
- * @uses      Symfony\Component\Yaml\Yaml
  * @author    David Monllaó <david.monllao@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -21,19 +19,19 @@ class MoodleGherkin extends Gherkin
 {
 
     /**
-     * Moodle config file contents
+     * Moodle config
      * @var array
      */
     protected $moodleConfig;
 
     /**
-     * Loads and parses the Moodle config file
+     * Loads the Moodle config
      *
-     * @param string  $moodleConfigPath
+     * @param array $parameters
      */
-    public function __construct($moodleConfigPath)
+    public function __construct($parameters)
     {
-        $this->moodleConfig = Yaml::parse($moodleConfigPath);
+        $this->moodleConfig = $parameters;
     }
 
     /**
@@ -54,14 +52,16 @@ class MoodleGherkin extends Gherkin
         }
 
         if (!is_array($this->moodleConfig)) {
-            throw new RuntimeException('The moodledata config.yml file can not be read by behat, ensure that you specified it\'s path in behat.yml');
+            throw new RuntimeException('There are no Moodle features nor steps definitions');
         }
 
         // Loads all the features files of each Moodle component.
         $features = array();
         if (!empty($this->moodleConfig['features'])) {
             foreach ($this->moodleConfig['features'] as $path) {
-                $features = array_merge($features, parent::load($path, $filters));
+                if (file_exists($path)) {
+                    $features = array_merge($features, parent::load($path, $filters));
+                }
             }
         }
         return $features;
