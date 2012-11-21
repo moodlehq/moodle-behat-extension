@@ -5,8 +5,9 @@
 
     <parameters>
         <parameter key="behat.moodle.parameters"></parameter>
-        <parameter key="gherkin.class">Moodle\BehatExtension\Gherkin\MoodleGherkin</parameter>
+        <parameter key="moodle.gherkin.class">Moodle\BehatExtension\Gherkin\MoodleGherkin</parameter>
         <parameter key="moodle.context.initializer.class">Moodle\BehatExtension\Context\Initializer\MoodleAwareInitializer</parameter>
+        <parameter key="moodle.help_printer.definitions.class">Moodle\BehatExtension\HelpPrinter\MoodleDefinitionsPrinter</parameter>
     </parameters>
     <services>
 
@@ -17,8 +18,14 @@
         </service>
 
         <!-- Overwritting Gherkin service passing moodle config path -->
-        <service id="gherkin" class="%gherkin.class%">
+        <service id="gherkin" class="%moodle.gherkin.class%">
             <argument>%behat.moodle.parameters%</argument>
+        </service>
+
+        <!-- Custom printer -->
+        <service id="behat.help_printer.definitions" class="%moodle.help_printer.definitions.class%">
+            <argument type="service" id="behat.definition.dispatcher" />
+            <argument type="service" id="behat.translator" />
         </service>
     </services>
 </container>
