@@ -63,10 +63,17 @@ TPL;
                 continue;
             }
 
-            // Leave the regexp as human-readable as possible
-            $regex = substr($regex, 2, strlen($regex) - 4);   // Removing beginning and end
-            // TODO preg_replace from regexps to <descriptor> values with fallback to "value"
-            $regex = htmlentities($regex);
+            // Leave the regexp as human-readable as possible.
+
+            // Removing beginning and end.
+            $regex = substr($regex, 2, strlen($regex) - 4);
+
+            // Replacing inline regex for expected info string.
+            $regex = preg_replace_callback(
+                '/"\(\?P<([^>]*)>(.*?)"( |$)/',
+                function ($matches) {
+                    return '"' . strtoupper($matches[1]) . '" ';
+            }, $regex);
 
             $definitions[] = strtr($template, array(
                 '{regex}'       => $regex,
