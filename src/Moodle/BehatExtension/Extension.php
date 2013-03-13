@@ -41,6 +41,10 @@ class Extension implements ExtensionInterface
     {
         $builder->
             children()->
+                arrayNode('capabilities')->
+                    useAttributeAsKey('key')->
+                    prototype('variable')->end()->
+                end()->
                 arrayNode('features')->
                     useAttributeAsKey('key')->
                     prototype('variable')->end()->

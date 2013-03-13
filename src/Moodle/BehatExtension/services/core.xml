@@ -5,6 +5,7 @@
 
     <parameters>
         <parameter key="behat.moodle.parameters"></parameter>
+        <parameter key="behat.mink.driver.selenium2.class">Moodle\BehatExtension\Driver\MoodleSelenium2Driver</parameter>
         <parameter key="moodle.gherkin.class">Moodle\BehatExtension\Gherkin\MoodleGherkin</parameter>
         <parameter key="moodle.context.initializer.class">Moodle\BehatExtension\Context\Initializer\MoodleAwareInitializer</parameter>
         <parameter key="moodle.help_printer.definitions.class">Moodle\BehatExtension\HelpPrinter\MoodleDefinitionsPrinter</parameter>
@@ -27,5 +28,20 @@
             <argument type="service" id="behat.definition.dispatcher" />
             <argument type="service" id="behat.translator" />
         </service>
+
+        <!-- We want to add our custom capabilities for saucelabs or whatever -->
+        <service id="behat.mink.session.selenium2" class="%behat.mink.session.class%">
+            <argument type="service">
+                <service class="%behat.mink.driver.selenium2.class%">
+                    <argument>%behat.mink.selenium2.browser%</argument>
+                    <argument>%behat.mink.selenium2.capabilities%</argument>
+                    <argument>%behat.mink.selenium2.wd_host%</argument>
+                    <argument>%behat.moodle.parameters%</argument>
+                </service>
+            </argument>
+            <argument type="service" id="behat.mink.selector.handler" />
+            <tag name="behat.mink.session" alias="selenium2" />
+        </service>
+
     </services>
 </container>
