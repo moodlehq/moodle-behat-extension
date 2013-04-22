@@ -30,4 +30,61 @@ class MoodleSelenium2Driver extends Selenium2Driver
 
         parent::__construct($browserName, $desiredCapabilities, $wdHost);
     }
+
+    /**
+     * Drag one element onto another.
+     *
+     * Override the original one to give YUI drag & drop
+     * time to consider it a valid drag & drop. It will need
+     * more changes in future to properly adapt to how YUI dd
+     * component behaves.
+     *
+     * @param   string  $sourceXpath
+     * @param   string  $destinationXpath
+     */
+    public function dragTo($sourceXpath, $destinationXpath)
+    {
+        $source      = $this->getWebDriverSession()->element('xpath', $sourceXpath);
+        $destination = $this->getWebDriverSession()->element('xpath', $destinationXpath);
+
+        // TODO: MDL-39727 This method requires improvements according to the YUI drag and drop component.
+
+        $this->getWebDriverSession()->moveto(array(
+            'element' => $source->getID()
+        ));
+
+        $script = <<<JS
+(function (element) {
+    var event = document.createEvent("HTMLEvents");
+
+    event.initEvent("dragstart", true, true);
+    event.dataTransfer = {};
+
+    element.dispatchEvent(event);
+}({{ELEMENT}}));
+JS;
+        $this->withSyn()->executeJsOnXpath($sourceXpath, $script);
+
+        $this->getWebDriverSession()->buttondown();
+        $this->getWebDriverSession()->moveto(array(
+            'element' => $destination->getID()
+        ));
+
+        // We add a 2 seconds wait to make YUI dd happy.
+        $this->wait(2 * 1000, false);
+
+        $this->getWebDriverSession()->buttonup();
+
+        $script = <<<JS
+(function (element) {
+    var event = document.createEvent("HTMLEvents");
+
+    event.initEvent("drop", true, true);
+    event.dataTransfer = {};
+
+    element.dispatchEvent(event);
+}({{ELEMENT}}));
+JS;
+        $this->withSyn()->executeJsOnXpath($destinationXpath, $script);
+    }
 }
