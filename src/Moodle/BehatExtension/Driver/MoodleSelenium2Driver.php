@@ -11,6 +11,12 @@ class MoodleSelenium2Driver extends Selenium2Driver
 {
 
     /**
+     * Dirty attribute to get the browser name; $browserName is private
+     * @var string
+     */
+    protected $browser;
+
+    /**
      * Instantiates the driver.
      *
      * @param string    $browser Browser name
@@ -29,6 +35,19 @@ class MoodleSelenium2Driver extends Selenium2Driver
         }
 
         parent::__construct($browserName, $desiredCapabilities, $wdHost);
+
+        $this->browser = $browserName;
+    }
+
+    /**
+     * Returns the browser being used.
+     *
+     * We need to know it in case there are differences between browsers in the steps.
+     *
+     * @return string
+     */
+    public function getBrowserName() {
+        return $this->browser;
     }
 
     /**
