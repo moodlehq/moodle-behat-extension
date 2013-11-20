@@ -29,7 +29,13 @@ class Extension implements ExtensionInterface
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/services'));
         $loader->load('core.xml');
 
+        // Getting the extension parameters.
         $container->setParameter('behat.moodle.parameters', $config);
+
+        // Adding moodle formatters to the list of supported formatted.
+        if (isset($config['formatters'])) {
+            $container->setParameter('behat.formatter.classes', $config['formatters']);
+        }
     }
 
     /**
@@ -53,6 +59,11 @@ class Extension implements ExtensionInterface
                     useAttributeAsKey('key')->
                     prototype('variable')->end()->
                 end()->
+                arrayNode('formatters')->
+                    useAttributeAsKey('key')->
+                    prototype('variable')->end()->
+                end()->
+
             end()->
         end();
     }
@@ -66,4 +77,5 @@ class Extension implements ExtensionInterface
     {
         return array();
     }
+
 }

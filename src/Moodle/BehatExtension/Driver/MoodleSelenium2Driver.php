@@ -14,7 +14,7 @@ class MoodleSelenium2Driver extends Selenium2Driver
      * Dirty attribute to get the browser name; $browserName is private
      * @var string
      */
-    protected $browser;
+    protected static $browser;
 
     /**
      * Instantiates the driver.
@@ -36,18 +36,62 @@ class MoodleSelenium2Driver extends Selenium2Driver
 
         parent::__construct($browserName, $desiredCapabilities, $wdHost);
 
-        $this->browser = $browserName;
+        // This class is instantiated by the dependencies injection system so
+        // prior to all of beforeSuite subscribers which will call getBrowser*()
+        self::$browser = $browserName;
+    }
+
+    /**
+     * Forwards to getBrowser() so we keep compatibility with both static and non-static accesses.
+     *
+     * @deprecated
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
+     */
+    public static function __callStatic($name, $arguments)
+    {
+        if ($name == 'getBrowserName') {
+            return self::getBrowser();
+        }
+
+        // Fallbacks calling the requested static method, we don't
+        // even know if it exists or not.
+        return call_user_func(array(self, $name), $arguments);
+    }
+
+    /**
+     * Forwards to getBrowser() so we keep compatibility with both static and non-static accesses.
+     *
+     * @deprecated
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        if ($name == 'getBrowserName') {
+            return self::getBrowser();
+        }
+
+        // Fallbacks calling the requested instance method, we don't
+        // even know if it exists or not.
+        return call_user_func(array($this, $name), $arguments);
     }
 
     /**
      * Returns the browser being used.
      *
-     * We need to know it in case there are differences between browsers in the steps.
+     * We need to know it:
+     * - To show info about the run.
+     * - In case there are differences between browsers in the steps.
      *
+     * @static
      * @return string
      */
-    public function getBrowserName() {
-        return $this->browser;
+    public static function getBrowser()
+    {
+        return self::$browser;
     }
 
     /**
