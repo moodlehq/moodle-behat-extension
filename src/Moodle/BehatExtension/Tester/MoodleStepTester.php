@@ -35,6 +35,19 @@ class MoodleStepTester extends StepTester
         // Redirect to the parent to run the step.
         $afterEvent = parent::executeStep($step);
 
+        // Catch Moodle Behat skip exception.
+        if ($afterEvent->getException() instanceof SkippedException) {
+            return new StepEvent(
+                $afterEvent->getStep(),
+                $afterEvent->getLogicalParent(),
+                $afterEvent->getContext(),
+                1, // const SKIPPED   = 1;
+                $afterEvent->getDefinition(),
+                $afterEvent->getException(),
+                null
+            );
+        }
+
         // Extra step, looking for a moodle exception, a debugging() message or a PHP debug message.
         $checkingStep = new StepNode('Then', 'I look for exceptions', $step->getLine());
         $afterExceptionCheckingEvent = parent::executeStep($checkingStep);
