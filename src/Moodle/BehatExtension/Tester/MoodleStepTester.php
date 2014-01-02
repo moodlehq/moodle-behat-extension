@@ -4,7 +4,15 @@ namespace Moodle\BehatExtension\Tester;
 
 use Behat\Behat\Tester\StepTester,
     Behat\Behat\Event\StepEvent,
-    Behat\Gherkin\Node\StepNode;
+    Behat\Behat\Definition\DefinitionInterface,
+    Behat\Behat\Context\ContextInterface,
+    Behat\Behat\Context\Step\SubstepInterface,
+    Behat\Gherkin\Node\AbstractNode,
+    Behat\Gherkin\Node\StepNode,
+    Behat\Gherkin\Node\ScenarioNode;
+
+use Symfony\Component\DependencyInjection\ContainerInterface,
+    Symfony\Component\EventDispatcher\Event;
 
 /**
  * StepTester extension to look for exceptions after each step.
@@ -18,6 +26,105 @@ use Behat\Behat\Tester\StepTester,
  */
 class MoodleStepTester extends StepTester
 {
+
+    /**
+     * The text of the step to look for exceptions / debugging messages.
+     */
+    const EXCEPTIONS_STEP_TEXT = 'I look for exceptions';
+
+    /**
+     * Grrrrr, we can not overwrite the parent one.
+     *
+     * @var ContextInterface
+     */
+    private $moodlecontext;
+
+    /**
+     * Grrrrr, we can not overwrite the parent one.
+     *
+     * @var Event
+     */
+    private $moodledispatcher;
+
+    /**
+     * Grrrrr, we can not overwrite the parent one.
+     *
+     * @var ScenarioNode
+     */
+    private $moodlelogicalParent;
+
+    /**
+     * We only dispatch the after step event when a "final" step has been reached.
+     *
+     * @var bool
+     */
+    private $dispatchafterstep = false;
+
+    /**
+     * Initializes tester.
+     *
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->moodledispatcher  = $container->get('behat.event_dispatcher');
+        parent::__construct($container);
+    }
+
+    /**
+     * Sets run context.
+     *
+     * Grrrrr, we can not overwrite the parent one.
+     *
+     * @param ContextInterface $context
+     */
+    public function setContext(ContextInterface $context)
+    {
+        $this->moodlecontext = $context;
+        parent::setContext($context);
+    }
+
+    /**
+     * Sets logical parent of the step, which is always a ScenarioNode.
+     *
+     * Grrrrr, we can not overwrite the parent one.
+     *
+     * @param ScenarioNode $parent
+     */
+    public function setLogicalParent(ScenarioNode $parent)
+    {
+        $this->moodlelogicalParent = $parent;
+        parent::setLogicalParent($parent);
+    }
+
+    /**
+     * Visits & tests StepNode.
+     *
+     * Parent method overwriten to dispatch the afterStep event
+     * only when the executed step was not a chained step.
+     *
+     * @param AbstractNode $step
+     *
+     * @return integer
+     */
+    public function visit(AbstractNode $step)
+    {
+
+        // executeStepsChainWithHooks() will mark it as true if necessary.
+        $this->dispatchafterstep = false;
+
+        $this->moodledispatcher->dispatch('beforeStep', new StepEvent(
+            $step, $this->moodlelogicalParent, $this->moodlecontext
+        ));
+        $afterEvent = $this->executeStep($step);
+
+        // Only if it is not a step with chained steps.
+        if ($this->dispatchafterstep !== false) {
+            $this->moodledispatcher->dispatch('afterStep', $afterEvent);
+        }
+
+        return $afterEvent->getResult();
+    }
 
     /**
      * Searches and runs provided step delegating all the process to the parent class
@@ -41,7 +148,7 @@ class MoodleStepTester extends StepTester
                 $afterEvent->getStep(),
                 $afterEvent->getLogicalParent(),
                 $afterEvent->getContext(),
-                1, // const SKIPPED   = 1;
+                StepEvent::SKIPPED,
                 $afterEvent->getDefinition(),
                 $afterEvent->getException(),
                 null
@@ -49,7 +156,7 @@ class MoodleStepTester extends StepTester
         }
 
         // Extra step, looking for a moodle exception, a debugging() message or a PHP debug message.
-        $checkingStep = new StepNode('Then', 'I look for exceptions', $step->getLine());
+        $checkingStep = new StepNode('Then', self::EXCEPTIONS_STEP_TEXT, $step->getLine());
         $afterExceptionCheckingEvent = parent::executeStep($checkingStep);
 
         // If it find something wrong we overwrite the original step result.
@@ -69,4 +176,71 @@ class MoodleStepTester extends StepTester
 
         return $afterEvent;
     }
+
+    /**
+     * Executes provided step definition.
+     *
+     * We extended because executeStepsChain is private.
+     *
+     * @param StepNode            $step       step node
+     * @param DefinitionInterface $definition step definition
+     */
+    protected function executeStepDefinition(StepNode $step, DefinitionInterface $definition)
+    {
+        $this->executeStepsChainWithHooks($step, $definition->run($this->moodlecontext));
+    }
+
+    /**
+     * Executes steps chain (if there's one).
+     *
+     * Overwriten method to run behat hooks between chain steps.
+     *
+     * @param StepNode $step  step node
+     * @param mixed    $chain chain
+     *
+     * @throws \Exception
+     */
+    private function executeStepsChainWithHooks(StepNode $step, $chain = null)
+    {
+        if (null === $chain) {
+
+            // If there are no more chained steps below we will dispatch the
+            // after step event, skipping the step that looks for exceptions here.
+            if (strstr($step->getText(), self::EXCEPTIONS_STEP_TEXT) === false) {
+                $this->dispatchafterstep = true;
+            }
+            return;
+        }
+
+        $chain = is_array($chain) ? $chain : array($chain);
+        foreach ($chain as $chainItem) {
+            if ($chainItem instanceof SubstepInterface) {
+                $substepNode = $chainItem->getStepNode();
+                $substepNode->setParent($step->getParent());
+
+                $this->dispatchafterstep = false;
+
+                // Dispatch beforeStep event.
+                $this->moodledispatcher->dispatch('beforeStep', new StepEvent(
+                    $substepNode, $this->moodlelogicalParent, $this->moodlecontext
+                ));
+
+                $substepEvent = $this->executeStep($substepNode);
+
+                // Dispatch afterStep event.
+                if ($this->dispatchafterstep === true) {
+                    $this->moodledispatcher->dispatch('afterStep', $substepEvent);
+                    $this->dispatchafterstep = false;
+                }
+
+                if (StepEvent::PASSED !== $substepEvent->getResult()) {
+                    throw $substepEvent->getException();
+                }
+            } elseif (is_callable($chainItem)) {
+                $this->executeStepsChainWithHooks($step, call_user_func($chainItem));
+            }
+        }
+
+    }
+
 }
