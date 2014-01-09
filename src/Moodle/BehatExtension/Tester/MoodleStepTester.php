@@ -11,6 +11,8 @@ use Behat\Behat\Tester\StepTester,
     Behat\Gherkin\Node\StepNode,
     Behat\Gherkin\Node\ScenarioNode;
 
+use Moodle\BehatExtension\Exception\SkippedException as SkippedException;
+
 use Symfony\Component\DependencyInjection\ContainerInterface,
     Symfony\Component\EventDispatcher\Event;
 
