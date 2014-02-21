@@ -179,4 +179,20 @@ JS;
         return $this;
     }
 
+    /**
+     * Public interface to run Syn scripts.
+     *
+     * @see self::executeJsOnXpath()
+     *
+     * @param  string   $xpath  the xpath to search with
+     * @param  string   $script the script to execute
+     * @param  Boolean  $sync   whether to run the script synchronously (default is TRUE)
+     *
+     * @return mixed
+     */
+    public function triggerSynScript($xpath, $script, $sync = true)
+    {
+        return $this->withSyn()->executeJsOnXpath($xpath, $script, $sync);
+    }
+
 }
