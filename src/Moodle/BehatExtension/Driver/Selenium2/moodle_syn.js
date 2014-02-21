@@ -1,9 +1,10 @@
-/*
+/**
  * Syn - 0.0.2
  * 
- * Copyright (c) 2014 Bitovi
- * Fri, 24 Jan 2014 00:49:17 GMT
- * Licensed MIT */
+ * @copyright 2014 Bitovi
+ * Fri, 21 Feb 2014 01:52:44 GMT
+ * @license MIT
+ */
 
 !function(window) {
 
@@ -1057,15 +1058,14 @@ var __m3 = (function(Syn) {
 			setTimeout(arguments.callee, 1)
 			return;
 		}
-		var oldSynth = window.__synthTest;
-		window.__synthTest = function() {
+		Syn.support.linkHrefJSTest = function() {
 			Syn.support.linkHrefJS = true;
 		}
 
 		var div = document.createElement("div"),
 			checkbox, submit, form, input, select;
 
-		div.innerHTML = "<form id='outer'>" + "<input name='checkbox' type='checkbox'/>" + "<input name='radio' type='radio' />" + "<input type='submit' name='submitter'/>" + "<input type='input' name='inputter'/>" + "<input name='one'>" + "<input name='two'/>" + "<a href='javascript:__synthTest()' id='synlink'></a>" + "<select><option></option></select>" + "</form>";
+		div.innerHTML = "<form id='outer'>" + "<input name='checkbox' type='checkbox'/>" + "<input name='radio' type='radio' />" + "<input type='submit' name='submitter'/>" + "<input type='input' name='inputter'/>" + "<input name='one'>" + "<input name='two'/>" + "<a href='javascript:Syn.support.linkHrefJSTest()' id='synlink'></a>" + "<select><option></option></select>" + "</form>";
 		document.documentElement.appendChild(div);
 		form = div.firstChild
 		checkbox = form.childNodes[0];
@@ -1132,7 +1132,6 @@ var __m3 = (function(Syn) {
 		document.documentElement.removeChild(div);
 
 		//check stuff
-		window.__synthTest = oldSynth;
 		Syn.support.ready++;
 	})();
 	return Syn;
@@ -2235,6 +2234,10 @@ var __m5 = (function(Syn) {
 				return;
 			}
 
+            // Store the current state before making any changes to focus.
+            var startPos = [ window.scrollX, window.scrollY ],
+                startNode = window.document.activeElement;
+
 			var div = document.createElement("div"),
 				checkbox, submit, form, input, submitted = false,
 				anchor, textarea, inputter, one;
@@ -2304,6 +2307,11 @@ var __m5 = (function(Syn) {
 			Syn.support.oninput = 'oninput' in one;
 			
 			document.documentElement.removeChild(div);
+            // Return element focus and scroll position to it's position at the start of the function.
+            if (startNode) {
+                startNode.focus();
+            }
+            window.scrollTo(startPos[0], startPos[1]);
 
 			Syn.support.ready++;
 		}();
