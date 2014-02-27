@@ -2,7 +2,7 @@
  * Syn - 0.0.2
  * 
  * @copyright 2014 Bitovi
- * Fri, 21 Feb 2014 01:52:44 GMT
+ * Wed, 26 Feb 2014 08:30:25 GMT
  * @license MIT
  */
 
@@ -1058,14 +1058,15 @@ var __m3 = (function(Syn) {
 			setTimeout(arguments.callee, 1)
 			return;
 		}
-		Syn.support.linkHrefJSTest = function() {
-			Syn.support.linkHrefJS = true;
-		}
+        window.linkHrefJS = Syn.support.linkHrefJS;
+		window.synSupportLinkHrefJSTest = function() {
+			linkHrefJS = true;
+		};
 
 		var div = document.createElement("div"),
 			checkbox, submit, form, input, select;
 
-		div.innerHTML = "<form id='outer'>" + "<input name='checkbox' type='checkbox'/>" + "<input name='radio' type='radio' />" + "<input type='submit' name='submitter'/>" + "<input type='input' name='inputter'/>" + "<input name='one'>" + "<input name='two'/>" + "<a href='javascript:Syn.support.linkHrefJSTest()' id='synlink'></a>" + "<select><option></option></select>" + "</form>";
+		div.innerHTML = "<form id='outer'>" + "<input name='checkbox' type='checkbox'/>" + "<input name='radio' type='radio' />" + "<input type='submit' name='submitter'/>" + "<input type='input' name='inputter'/>" + "<input name='one'>" + "<input name='two'/>" + "<a href='javascript:synSupportLinkHrefJSTest()' id='synlink'></a>" + "<select><option></option></select>" + "</form>";
 		document.documentElement.appendChild(div);
 		form = div.firstChild
 		checkbox = form.childNodes[0];
