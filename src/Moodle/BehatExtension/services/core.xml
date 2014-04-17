@@ -10,6 +10,7 @@
         <parameter key="moodle.context.initializer.class">Moodle\BehatExtension\Context\Initializer\MoodleAwareInitializer</parameter>
         <parameter key="behat.help_printer.definitions.class">Moodle\BehatExtension\HelpPrinter\MoodleDefinitionsPrinter</parameter>
         <parameter key="behat.tester.step.class">Moodle\BehatExtension\Tester\MoodleStepTester</parameter>
+        <parameter key="behat.tester.scenario.class">Moodle\BehatExtension\Tester\MoodleScenarioTester</parameter>
     </parameters>
     <services>
 

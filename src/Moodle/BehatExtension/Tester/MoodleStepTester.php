@@ -6,6 +6,7 @@ use Behat\Behat\Tester\StepTester,
     Behat\Behat\Event\StepEvent,
     Behat\Behat\Definition\DefinitionInterface,
     Behat\Behat\Context\ContextInterface,
+    Behat\Gherkin\Node\OutlineNode,
     Behat\Behat\Context\Step\SubstepInterface,
     Behat\Gherkin\Node\AbstractNode,
     Behat\Gherkin\Node\StepNode,
@@ -52,6 +53,13 @@ class MoodleStepTester extends StepTester
      * @var ScenarioNode
      */
     private $moodlelogicalParent;
+
+    /**
+     * Tokens in case of running a outline example.
+     *
+     * @var array
+     */
+    private $tokens = array();
 
     /**
      * We only dispatch the after step event when a "final" step has been reached.
@@ -102,6 +110,17 @@ class MoodleStepTester extends StepTester
     {
         $this->moodlelogicalParent = $parent;
         parent::setLogicalParent($parent);
+    }
+
+    /**
+     * Sets the example tokens if they exists.
+     *
+     * @param array $tokens
+     * @return void
+     */
+    public function setExampleTokens($tokens)
+    {
+        $this->tokens = $tokens;
     }
 
     /**
@@ -219,8 +238,14 @@ class MoodleStepTester extends StepTester
         $chain = is_array($chain) ? $chain : array($chain);
         foreach ($chain as $chainItem) {
             if ($chainItem instanceof SubstepInterface) {
+
                 $substepNode = $chainItem->getStepNode();
                 $substepNode->setParent($step->getParent());
+
+                // Replace by tokens when needed.
+                if ($substepNode->getParent() instanceof OutlineNode) {
+                    $substepNode = $substepNode->createExampleRowStep($this->tokens);
+                }
 
                 $this->dispatchafterstep = false;
 
