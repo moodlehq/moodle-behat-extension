@@ -18,7 +18,8 @@
         "behat/mink": "1.4.3",
         "behat/mink-extension": "1.0.1",
         "behat/mink-goutte-driver": "1.0.8",
-        "behat/mink-selenium2-driver": "1.0.6"
+        "behat/mink-selenium2-driver": "1.0.6",
+        "symfony/symfony": "2.2.9"
     },
     "autoload": {
         "psr-0": {
