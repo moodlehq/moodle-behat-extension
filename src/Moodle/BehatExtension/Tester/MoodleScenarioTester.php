@@ -5,7 +5,8 @@ namespace Moodle\BehatExtension\Tester;
 use Behat\Behat\Tester\ScenarioTester;
 
 use Behat\Gherkin\Node\ScenarioNode,
-    Behat\Gherkin\Node\StepNode;
+    Behat\Gherkin\Node\StepNode,
+    Behat\Gherkin\Node\BackgroundNode;
 
 use Behat\Behat\Context\ContextInterface;
 
@@ -75,4 +76,25 @@ class MoodleScenarioTester extends ScenarioTester
         return $step->accept($tester);
     }
 
+    /**
+     * Visits & tests BackgroundNode.
+     *
+     * @param BackgroundNode   $background
+     * @param ScenarioNode     $logicalParent
+     * @param ContextInterface $context
+     *
+     * @see BackgroundTester::visit()
+     *
+     * @return integer
+     */
+    protected function visitBackground(BackgroundNode $background, ScenarioNode $logicalParent,
+                                       ContextInterface $context)
+    {
+        $tester = $this->container->get('behat.tester.background');
+        $tester->setLogicalParent($logicalParent);
+        $tester->setContext($context);
+        $tester->setSkip($this->moodleskip);
+
+        return $background->accept($tester);
+    }
 }
