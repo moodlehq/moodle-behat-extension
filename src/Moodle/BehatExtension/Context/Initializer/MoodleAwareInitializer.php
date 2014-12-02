@@ -2,9 +2,10 @@
 
 namespace Moodle\BehatExtension\Context\Initializer;
 
-use Moodle\BehatExtension\Context\MoodleContext,
-    Behat\Behat\Context\ContextInterface,
-    Behat\Behat\Context\Initializer\InitializerInterface;
+use Moodle\BehatExtension\Context\MoodleContext;
+use Behat\Behat\Context\Initializer\ContextInitializer;
+
+use Behat\Behat\Context\Context;
 
 /**
  * MoodleContext initializer
@@ -12,31 +13,29 @@ use Moodle\BehatExtension\Context\MoodleContext,
  * @author    David Monllaó <david.monllao@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class MoodleAwareInitializer implements InitializerInterface
+class MoodleAwareInitializer implements ContextInitializer
 {
     private $parameters;
 
-    public function __construct(array $parameters)
-    {
+
+    /**
+     * Initializes initializer.
+     *
+     * @param Mink  $mink
+     * @param array $parameters
+     */
+    public function __construct(array $parameters) {
         $this->parameters = $parameters;
     }
 
     /**
-     * @see Behat\Behat\Context\Initializer.InitializerInterface::supports()
-     * @param ContextInterface $context
+     * Initializes provided context.
+     *
+     * @param Context $context
      */
-    public function supports(ContextInterface $context)
-    {
-        return ($context instanceof MoodleContext);
-    }
-
-    /**
-     * Passes the Moodle config to the main Moodle context
-     * @see Behat\Behat\Context\Initializer.InitializerInterface::initialize()
-     * @param ContextInterface $context
-     */
-    public function initialize(ContextInterface $context)
-    {
-        $context->setMoodleConfig($this->parameters);
+    public function initializeContext(Context $context) {
+        if (method_exists($context, 'setMoodleConfig')) {
+            $context->setMoodleConfig($this->parameters);
+        }
     }
 }

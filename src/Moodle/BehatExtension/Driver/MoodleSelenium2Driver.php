@@ -3,6 +3,7 @@
 namespace Moodle\BehatExtension\Driver;
 
 use Behat\Mink\Driver\Selenium2Driver as Selenium2Driver;
+use WebDriver\Key as key;
 
 /**
  * Selenium2 driver extension to allow extra selenium capabilities restricted by behat/mink-extension.
@@ -24,9 +25,7 @@ class MoodleSelenium2Driver extends Selenium2Driver
      * @param string    $wdHost The WebDriver host
      * @param array     $moodleParameters Moodle parameters including our non-behat-friendly selenium capabilities
      */
-    public function __construct($browserName = 'firefox', $desiredCapabilities = null, $wdHost = 'http://localhost:4444/wd/hub', $moodleParameters = false)
-    {
-
+    public function __construct($browserName = 'firefox', $desiredCapabilities = null, $wdHost = 'http://localhost:4444/wd/hub', $moodleParameters = array()) {
         // If they are set add them overridding if it's the case (not likely).
         if (!empty($moodleParameters) && !empty($moodleParameters['capabilities'])) {
             foreach ($moodleParameters['capabilities'] as $key => $capability) {
@@ -49,8 +48,7 @@ class MoodleSelenium2Driver extends Selenium2Driver
      * @param array $arguments
      * @return mixed
      */
-    public static function __callStatic($name, $arguments)
-    {
+    public static function __callStatic($name, $arguments) {
         if ($name == 'getBrowserName') {
             return self::getBrowser();
         }
@@ -68,8 +66,7 @@ class MoodleSelenium2Driver extends Selenium2Driver
      * @param array $arguments
      * @return mixed
      */
-    public function __call($name, $arguments)
-    {
+    public function __call($name, $arguments) {
         if ($name == 'getBrowserName') {
             return self::getBrowser();
         }
@@ -89,8 +86,7 @@ class MoodleSelenium2Driver extends Selenium2Driver
      * @static
      * @return string
      */
-    public static function getBrowser()
-    {
+    public static function getBrowser() {
         return self::$browser;
     }
 
@@ -105,8 +101,7 @@ class MoodleSelenium2Driver extends Selenium2Driver
      * @param   string  $sourceXpath
      * @param   string  $destinationXpath
      */
-    public function dragTo($sourceXpath, $destinationXpath)
-    {
+    public function dragTo($sourceXpath, $destinationXpath) {
         $source      = $this->getWebDriverSession()->element('xpath', $sourceXpath);
         $destination = $this->getWebDriverSession()->element('xpath', $destinationXpath);
 
@@ -190,9 +185,75 @@ JS;
      *
      * @return mixed
      */
-    public function triggerSynScript($xpath, $script, $sync = true)
-    {
+    public function triggerSynScript($xpath, $script, $sync = true) {
         return $this->withSyn()->executeJsOnXpath($xpath, $script, $sync);
     }
 
+    /**
+     * Overriding this as key::TAB is causing page scroll and rubrics scenarios are failing.
+     * https://github.com/minkphp/MinkSelenium2Driver/issues/194
+     * {@inheritdoc}
+     */
+    public function setValue($xpath, $value) {
+        $value = strval($value);
+        $element = $this->getWebDriverSession()->element('xpath', $xpath);
+        $elementName = strtolower($element->name());
+
+        if ('select' === $elementName) {
+            if (is_array($value)) {
+                $this->deselectAllOptions($element);
+
+                foreach ($value as $option) {
+                    $this->selectOptionOnElement($element, $option, true);
+                }
+
+                return;
+            }
+
+            $this->selectOption($element, $value);
+
+            return;
+        }
+
+        if ('input' === $elementName) {
+            $elementType = strtolower($element->attribute('type'));
+
+            if (in_array($elementType, array('submit', 'image', 'button', 'reset'))) {
+                throw new DriverException(sprintf('Impossible to set value an element with XPath "%s" as it is not a select, textarea or textbox', $xpath));
+            }
+
+            if ('checkbox' === $elementType) {
+                if ($element->selected() xor (bool) $value) {
+                    $this->clickOnElement($element);
+                }
+
+                return;
+            }
+
+            if ('radio' === $elementType) {
+                $this->selectRadioValue($element, $value);
+
+                return;
+            }
+
+            if ('file' === $elementType) {
+                $element->postValue(array('value' => array(strval($value))));
+
+                return;
+            }
+        }
+
+        $value = strval($value);
+
+        if (in_array($elementName, array('input', 'textarea'))) {
+            $existingValueLength = strlen($element->attribute('value'));
+            // Add the TAB key to ensure we unfocus the field as browsers are triggering the change event only
+            // after leaving the field.
+            $value = str_repeat(Key::BACKSPACE . Key::DELETE, $existingValueLength) . $value;
+        }
+
+        $element->postValue(array('value' => array($value)));
+        $script = "Syn.trigger('change', {}, {{ELEMENT}})";
+        $this->withSyn()->executeJsOnXpath($xpath, $script);
+    }
 }
