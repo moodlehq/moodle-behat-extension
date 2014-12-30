@@ -47,6 +47,23 @@ class MoodleProgressFormatter extends ProgressFormatter
     {
         global $CFG;
 
+        // NO $CFG, surely a dry-run, let's try to find config.php using passed dirroot.
+        if (empty($CFG)) {
+            $params = $event->getContextParameters();
+            if (!isset($params['dirroot'])) {
+                return; // No param, nothing to do.
+            }
+
+            $configpath = $params['dirroot'] . '/config.php';
+            if (!file_exists($configpath) or !is_readable($configpath)) {
+                return; // No config.php, nothing to do.
+            }
+
+            // Have found a readable config.php, add it.
+            define('CLI_SCRIPT', true);
+            require_once($configpath);
+        }
+
         require_once($CFG->dirroot . '/lib/behat/classes/util.php');
 
         $browser = \Moodle\BehatExtension\Driver\MoodleSelenium2Driver::getBrowser();
