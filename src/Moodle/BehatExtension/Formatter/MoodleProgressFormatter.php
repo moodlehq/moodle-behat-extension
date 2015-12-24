@@ -54,9 +54,7 @@ class MoodleProgressFormatter extends ProgressFormatter
         // Calling all directly from here as we avoid more behat framework extensions.
         $runinfo = \behat_util::get_site_info();
         $runinfo .= 'Server OS "' . PHP_OS . '"' . ', Browser: "' . $browser . '"' . PHP_EOL;
-        if (in_array(strtolower($browser), array('chrome', 'safari', 'iexplore'))) {
-            $runinfo .= 'Browser specific fixes have been applied. See http://docs.moodle.org/dev/Acceptance_testing#Browser_specific_fixes' .  PHP_EOL;
-        }
+        $runinfo .= 'Behat specific fixes have been applied. See http://docs.moodle.org/dev/Acceptance_testing#Browser_specific_fixes' .  PHP_EOL;
         $runinfo .= 'Started at ' . date('d-m-Y, H:i', time());
 
         $this->writeln($runinfo);
