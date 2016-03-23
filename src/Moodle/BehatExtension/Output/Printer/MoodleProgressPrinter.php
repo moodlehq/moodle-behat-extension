@@ -102,6 +102,12 @@ final class MoodleProgressPrinter implements SetupPrinter {
      * @param CallResult    $callResult
      */
     private function printTeardownHookCallResult(OutputPrinter $printer, CallResult $callResult) {
+        // Notify dev that chained step is being used.
+        if (\Moodle\BehatExtension\EventDispatcher\Tester\ChainedStepTester::is_chained_step_used()) {
+            $printer->writeln();
+            $printer->write("{+failed}Chained steps are deprecated. See https://docs.moodle.org/dev/Acceptance_testing/Migrating_from_Behat_2.5_to_3.x_in_Moodle#Changes_required_in_context_file{-failed}");
+        }
+
         if (!$callResult->hasStdOut() && !$callResult->hasException()) {
             return;
         }

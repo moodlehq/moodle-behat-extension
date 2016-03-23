@@ -65,6 +65,12 @@ class ChainedStepTester implements StepTester {
     private $eventDispatcher;
 
     /**
+     * Keep status of chained steps if used.
+     * @var bool
+     */
+    protected static $chainedstepused = false;
+
+    /**
      * Constructor.
      *
      * @param StepTester $steptester single step tester.
@@ -155,8 +161,12 @@ class ChainedStepTester implements StepTester {
      * @return ExecutedStepResult|StepResult
      */
     private function runChainedSteps(Environment $env, FeatureNode $feature, ExecutedStepResult $result, $skip) {
+        // Set chained setp is used, so it can be used by formatter to o/p.
+        self::$chainedstepused = true;
+
         $callResult = $result->getCallResult();
         $steps = $callResult->getReturn();
+
         if (!is_array($steps)) {
             // Test it, no need to dispatch events for single chain.
             $stepResult = $this->test($env, $feature, $steps, $skip);
@@ -207,5 +217,13 @@ class ChainedStepTester implements StepTester {
         } else {
             return $result;
         }
+    }
+
+    /**
+     * Returns if cahined steps are used.
+     * @return bool.
+     */
+    public static function is_chained_step_used() {
+        return self::$chainedstepused;
     }
 }
