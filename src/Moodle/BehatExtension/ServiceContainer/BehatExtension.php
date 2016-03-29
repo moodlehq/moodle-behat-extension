@@ -137,7 +137,9 @@ class BehatExtension implements ExtensionInterface {
      * @return Definition
      */
     protected function createOutputPrinterDefinition() {
-        return new Definition('Behat\Behat\Output\Printer\ConsoleOutputPrinter');
+        return new Definition('Behat\Testwork\Output\Printer\StreamOutputPrinter', array(
+            new Definition('Behat\Behat\Output\Printer\ConsoleOutputFactory'),
+        ));
     }
 
     /**
@@ -149,7 +151,8 @@ class BehatExtension implements ExtensionInterface {
         $definition = new Definition('Moodle\BehatExtension\Definition\Printer\ConsoleDefinitionInformationPrinter', array(
             new Reference(CliExtension::OUTPUT_ID),
             new Reference(DefinitionExtension::PATTERN_TRANSFORMER_ID),
-            new Reference(DefinitionExtension::DEFINITION_TRANSLATOR_ID)
+            new Reference(DefinitionExtension::DEFINITION_TRANSLATOR_ID),
+            new Reference(GherkinExtension::KEYWORDS_ID)
         ));
         $container->removeDefinition('definition.information_printer');
         $container->setDefinition('definition.information_printer', $definition);
