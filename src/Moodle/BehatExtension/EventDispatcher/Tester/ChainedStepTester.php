@@ -28,6 +28,7 @@ use Behat\Behat\Tester\Result\ExecutedStepResult;
 use Behat\Behat\Tester\Result\SkippedStepResult;
 use Behat\Behat\Tester\Result\StepResult;
 use Behat\Behat\Tester\StepTester;
+use Behat\Behat\Tester\Result\UndefinedStepResult;
 use Moodle\BehatExtension\Context\Step\Given;
 use Moodle\BehatExtension\Context\Step\ChainedStep;
 use Behat\Gherkin\Node\FeatureNode;
@@ -103,10 +104,18 @@ class ChainedStepTester implements StepTester {
 
         if (!($result instanceof ExecutedStepResult) || !$this->supportsResult($result->getCallResult())) {
             $result = $this->checkSkipResult($result);
+
+            // If undefined step then don't continue chained steps.
+            if ($result instanceof UndefinedStepResult) {
+                return $result;
+            }
+
+            // If exception caught, then don't continue chained steps.
             if (($result instanceof ExecutedStepResult) && $result->hasException()) {
                 return $result;
             }
 
+            // If step is skipped, then return. no need to continue chain steps.
             if ($result instanceof SkippedStepResult) {
                 return $result;
             }
