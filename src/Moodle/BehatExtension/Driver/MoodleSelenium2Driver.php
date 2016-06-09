@@ -256,4 +256,14 @@ JS;
         $script = "Syn.trigger('change', {}, {{ELEMENT}})";
         $this->withSyn()->executeJsOnXpath($xpath, $script);
     }
+
+    /**
+     * Post key on specified xpath.
+     *
+     * @param string $xpath
+     */
+    public function post_key($key, $xpath) {
+        $element = $this->getWebDriverSession()->element('xpath', $xpath);
+        $element->postValue(array('value' => array($key)));
+    }
 }
