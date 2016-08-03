@@ -45,6 +45,11 @@ final class MoodleProgressPrinter implements SetupPrinter {
     private $moodledirroot;
 
     /**
+     * @var bool true if output is displayed.
+     */
+    private static $outputdisplayed;
+
+    /**
      * Constructor.
      *
      * @param string $moodledirroot Moodle dir root.
@@ -57,7 +62,10 @@ final class MoodleProgressPrinter implements SetupPrinter {
      * {@inheritdoc}
      */
     public function printSetup(Formatter $formatter, Setup $setup) {
-        $this->printMoodleInfo($formatter->getOutputPrinter());
+        if (empty(self::$outputdisplayed)) {
+            $this->printMoodleInfo($formatter->getOutputPrinter());
+            self::$outputdisplayed = true;
+        }
     }
 
     /**
