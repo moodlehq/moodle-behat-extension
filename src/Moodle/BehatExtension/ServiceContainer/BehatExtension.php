@@ -21,6 +21,7 @@ use Behat\Testwork\Cli\ServiceContainer\CliExtension;
 use Behat\Behat\Definition\Printer\ConsoleDefinitionListPrinter;
 use Behat\Behat\Gherkin\ServiceContainer\GherkinExtension;
 use Behat\Testwork\Output\ServiceContainer\OutputExtension;
+use Behat\Testwork\Specification\ServiceContainer\SpecificationExtension;
 
 /**
  * Behat extension for moodle
@@ -32,6 +33,8 @@ class BehatExtension implements ExtensionInterface {
      * Extension configuration ID.
      */
     const MOODLE_ID = 'moodle';
+
+    const GHERKIN_ID = 'gherkin';
 
     /**
      * @var ServiceProcessor
@@ -81,6 +84,10 @@ class BehatExtension implements ExtensionInterface {
 
         // Load namespace alias.
         $this->alias_old_namespaces();
+
+        // Load skip passed controller and list locator.
+        $this->loadSkipPassedController($container, $config['passed_cache']);
+        $this->loadFilesystemSkipPassedScenariosListLocator($container);
     }
 
     /**
@@ -140,6 +147,35 @@ class BehatExtension implements ExtensionInterface {
         return new Definition('Behat\Testwork\Output\Printer\StreamOutputPrinter', array(
             new Definition('Behat\Behat\Output\Printer\ConsoleOutputFactory'),
         ));
+    }
+
+    /**
+     * Loads skip passed controller.
+     *
+     * @param ContainerBuilder $container
+     * @param null|string      $cachePath
+     */
+    protected function loadSkipPassedController(ContainerBuilder $container, $cachePath) {
+        $definition = new Definition('Moodle\BehatExtension\Tester\Cli\SkipPassedController', array(
+            new Reference(EventDispatcherExtension::DISPATCHER_ID),
+            $cachePath,
+            $container->getParameter('paths.base')
+        ));
+        $definition->addTag(CliExtension::CONTROLLER_TAG, array('priority' => 200));
+        $container->setDefinition(CliExtension::CONTROLLER_TAG . '.passed', $definition);
+    }
+
+    /**
+     * Loads filesystem passed scenarios list locator.
+     *
+     * @param ContainerBuilder $container
+     */
+    private function loadFilesystemSkipPassedScenariosListLocator(ContainerBuilder $container) {
+        $definition = new Definition('Moodle\BehatExtension\Locator\FilesystemSkipPassedListLocator', array(
+            new Reference(self::GHERKIN_ID)
+        ));
+        $definition->addTag(SpecificationExtension::LOCATOR_TAG, array('priority' => 50));
+        $container->setDefinition(SpecificationExtension::LOCATOR_TAG . '.filesystem_skip_passed_scenarios_list', $definition);
     }
 
     /**
@@ -222,8 +258,15 @@ class BehatExtension implements ExtensionInterface {
                 scalarNode('moodledirroot')->
                     defaultNull()->
                     end()->
-            end()->
-        end();
+                scalarNode('passed_cache')->
+                    info('Sets the passed cache path')->
+                    defaultValue(
+                        is_writable(sys_get_temp_dir())
+                            ? sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'behat_passed_cache'
+                            : null)->
+                    end()->
+                end()->
+            end();
     }
 
     /**
