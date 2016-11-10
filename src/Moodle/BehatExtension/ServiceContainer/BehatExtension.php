@@ -98,7 +98,7 @@ class BehatExtension implements ExtensionInterface {
     protected function loadMoodleListFormatter(ContainerBuilder $container) {
         $definition = new Definition('Moodle\BehatExtension\Output\Formatter\MoodleListFormatter', array(
             'moodle_list',
-            'Count steps in feature files. Use with --dry-run',
+            'List all scenarios. Use with --dry-run',
             array('stepcount' => false),
             $this->createOutputPrinterDefinition()
         ));
@@ -114,7 +114,7 @@ class BehatExtension implements ExtensionInterface {
     protected function loadMoodleStepcountFormatter(ContainerBuilder $container) {
         $definition = new Definition('Moodle\BehatExtension\Output\Formatter\MoodleStepcountFormatter', array(
             'moodle_stepcount',
-            'List all scenarios. Use with --dry-run',
+            'Count steps in feature files. Use with --dry-run',
             array('stepcount' => false),
             $this->createOutputPrinterDefinition()
         ));
