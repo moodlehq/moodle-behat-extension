@@ -143,8 +143,7 @@ class MoodleListFormatter implements Formatter {
      */
     public function afterOutlineExample(AfterOutlineTested $event) {
         $outline = $event->getOutline();
-        $examples = $outline->getExamples();
-        $lines = $examples->getLine();
-        $this->printer->writeln($event->getFeature()->getFile() . ':' . $lines[$event->getIteration() + 1]);
+        $line = $outline->getLine();
+        $this->printer->writeln($event->getFeature()->getFile() . ':' . $line);
     }
 }
