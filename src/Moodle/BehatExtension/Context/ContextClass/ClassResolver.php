@@ -68,7 +68,7 @@ final class ClassResolver implements Resolver {
      */
     public function resolveClass($contextclass) {
         if (!is_array($this->moodlebehatcontexts)) {
-            throw new RuntimeException('There are no Moodle context with steps definitions');
+            throw new \RuntimeException('There are no Moodle context with steps definitions');
         }
 
         // Using the key as context identifier load context class.
@@ -76,7 +76,7 @@ final class ClassResolver implements Resolver {
             (file_exists($this->moodlebehatcontexts[$contextclass]))) {
             require_once($this->moodlebehatcontexts[$contextclass]);
         } else {
-            throw new RuntimeException('Moodle behat context "'.$contextclass.'" not found');
+            throw new \RuntimeException('Moodle behat context "'.$contextclass.'" not found');
         }
         return $contextclass;
     }
