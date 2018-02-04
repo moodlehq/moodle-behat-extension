@@ -3,7 +3,7 @@
     "description": "Moodle behat extension",
     "keywords": ["Moodle", "BDD", "Behat"],
     "type": "library",
-    "license": "GPLv3",
+    "license": "GPL-3.0-or-later",
     "authors": [
         {
             "name": "David Monllaó",
