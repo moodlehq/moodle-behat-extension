@@ -4,6 +4,8 @@ namespace Moodle\BehatExtension\Driver;
 
 use Behat\Mink\Driver\Selenium2Driver as Selenium2Driver;
 use WebDriver\Key as key;
+use Moodle\BehatExtension\Element\NodeElement;
+use Behat\Mink\Session;
 
 /**
  * Selenium2 driver extension to allow extra selenium capabilities restricted by behat/mink-extension.
@@ -16,6 +18,21 @@ class MoodleSelenium2Driver extends Selenium2Driver
      * @var string
      */
     protected static $browser;
+
+    /**
+     * @var Session The Mink Session
+     */
+    private $session;
+
+    /**
+     * Set the session in the driver.
+     */
+    public function setSession(Session $session) {
+        $this->session = $session;
+
+        // The parent also stores the session.
+        parent::setSession($session);
+    }
 
     /**
      * Instantiates the driver.
@@ -265,5 +282,21 @@ JS;
     public function post_key($key, $xpath) {
         $element = $this->getWebDriverSession()->element('xpath', $xpath);
         $element->postValue(array('value' => array($key)));
+    }
+
+    /**
+     * Find any Element at the specified xpath.
+     *
+     * @param string $xpath The xpath to search for
+     * @return NodeElement[]
+     */
+    public function find($xpath) {
+        $elements = array();
+
+        foreach ($this->findElementXpaths($xpath) as $xpath) {
+            $elements[] = new NodeElement($xpath, $this->session);
+        }
+
+        return $elements;
     }
 }
