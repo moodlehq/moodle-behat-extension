@@ -266,4 +266,45 @@ JS;
         $element = $this->getWebDriverSession()->element('xpath', $xpath);
         $element->postValue(array('value' => array($key)));
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        // There are times where the browser may fail, or the connection between Selenium and the browser dies.
+        // When this happens, the test run aborts.
+        //
+        // To counter this we attempt to perform a full stop and restart of the session, but we want to limit the number
+        // of times that we do so in case of a deeper issue.
+        static $restartCount = 0;
+
+        if ($restartCount >= 3) {
+            // There have been several restarts already.
+            // Do not attempt to catch the Exception. Something is very wrong.
+            return parent::reset();
+        }
+
+        try {
+            return parent::reset();
+        }
+        catch (\Exception $e) {
+            echo "\nUnable to reset the session. Attempting a session restart instead.\n";
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+
+            $restartCount++;
+        }
+
+        try {
+            // If the reset failed, there's a strong chance that the stop will fail too.
+            // We should still try though because we want to at least try and clean up.
+            $this->stop();
+        }
+        catch (\Exception $e) {
+        }
+
+        // Start a new session.
+        $this->start();
+    }
+
 }
