@@ -95,7 +95,7 @@ final class MoodleProgressPrinter implements SetupPrinter {
         // Calling all directly from here as we avoid more behat framework extensions.
         $runinfo = \behat_util::get_site_info();
         $runinfo .= 'Server OS "' . PHP_OS . '"' . ', Browser: "' . $browser . '"' . PHP_EOL;
-        if (in_array(strtolower($browser), array('chrome', 'safari', 'iexplore'))) {
+        if (in_array(strtolower($browser), ['chrome', 'firefox'])) {
             $runinfo .= 'Browser specific fixes have been applied. See http://docs.moodle.org/dev/Acceptance_testing#Browser_specific_fixes' .  PHP_EOL;
         }
         $runinfo .= 'Started at ' . date('d-m-Y, H:i', time());
