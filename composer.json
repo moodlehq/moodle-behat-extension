@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "php": ">=7.1.0",
+        "php": ">=7.2.0",
         "behat/mink": "~1.7",
         "behat/mink-extension": "~2.2",
         "behat/mink-goutte-driver": "~1.2",
