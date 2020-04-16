@@ -34,6 +34,7 @@ use Behat\Behat\Tester\StepTester;
 use Behat\Gherkin\Node\FeatureNode;
 use Behat\Gherkin\Node\StepNode;
 use Behat\Testwork\Environment\Environment;
+use Behat\Testwork\EventDispatcher\TestworkEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -70,13 +71,25 @@ final class MoodleEventDispatchingStepTester implements StepTester
      */
     public function setUp(Environment $env, FeatureNode $feature, StepNode $step, $skip) {
         $event = new BeforeStepTested($env, $feature, $step);
-        $this->eventDispatcher->dispatch($event::BEFORE, $event);
+        if (TestworkEventDispatcher::DISPATCHER_VERSION === 2) {
+            // Symfony 4.3 and up.
+            $this->eventDispatcher->dispatch($event, $event::BEFORE);
+        } else {
+            // TODO: Remove when our min supported version is >= 4.3.
+            $this->eventDispatcher->dispatch($event::BEFORE, $event);
+        }
 
         $setup = $this->baseTester->setUp($env, $feature, $step, $skip);
         $this->baseTester->setEventDispatcher($this->eventDispatcher);
 
         $event = new AfterStepSetup($env, $feature, $step, $setup);
-        $this->eventDispatcher->dispatch($event::AFTER_SETUP, $event);
+        if (TestworkEventDispatcher::DISPATCHER_VERSION === 2) {
+            // Symfony 4.3 and up.
+            $this->eventDispatcher->dispatch($event, $event::AFTER_SETUP);
+        } else {
+            // TODO: Remove when our min supported version is >= 4.3.
+            $this->eventDispatcher->dispatch($event::AFTER_SETUP, $event);
+        }
 
         return $setup;
     }
@@ -93,12 +106,24 @@ final class MoodleEventDispatchingStepTester implements StepTester
      */
     public function tearDown(Environment $env, FeatureNode $feature, StepNode $step, $skip, StepResult $result) {
         $event = new BeforeStepTeardown($env, $feature, $step, $result);
-        $this->eventDispatcher->dispatch($event::BEFORE_TEARDOWN, $event);
+        if (TestworkEventDispatcher::DISPATCHER_VERSION === 2) {
+            // Symfony 4.3 and up.
+            $this->eventDispatcher->dispatch($event, $event::BEFORE_TEARDOWN);
+        } else {
+            // TODO: Remove when our min supported version is >= 4.3.
+            $this->eventDispatcher->dispatch($event::BEFORE_TEARDOWN, $event);
+        }
 
         $teardown = $this->baseTester->tearDown($env, $feature, $step, $skip, $result);
 
         $event = new AfterStepTested($env, $feature, $step, $result, $teardown);
-        $this->eventDispatcher->dispatch($event::AFTER, $event);
+        if (TestworkEventDispatcher::DISPATCHER_VERSION === 2) {
+            // Symfony 4.3 and up.
+            $this->eventDispatcher->dispatch($event, $event::AFTER);
+        } else {
+            // TODO: Remove when our min supported version is >= 4.3.
+            $this->eventDispatcher->dispatch($event::AFTER, $event);
+        }
 
         return $teardown;
     }
