@@ -77,14 +77,24 @@ class NodeElement extends MinkNodeElement {
         $js = <<<EOF
 (function() {
     var node = document.evaluate("{$xpath}", document, null, XPathResult.ANY_TYPE, null).iterateNext();
-    function isVisible(element) {
-        var margin = {$margin};
-        var rect = element.getBoundingClientRect();
-        var viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
-        return !(rect.top < 0 + margin || (rect.bottom - viewHeight >= 0 - margin));
+    if (!node) {
+        return;
     }
 
-    if (node && !isVisible(node)) {
+    var margin = {$margin};
+    var rect = node.getBoundingClientRect();
+
+    var viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+    if (!(rect.top < 0 + margin || (rect.bottom - viewHeight >= 0 - margin))) {
+        node.scrollIntoView();
+        return;
+    }
+
+    if (!window.getElementFromPoint) {
+        return;
+    }
+
+    if (window.getElementFromPoint(rect.left + (rect.width / 2), rect.top + (rect.height / 2)) !== node) {
         node.scrollIntoView();
     }
 })();
