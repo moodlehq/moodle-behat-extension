@@ -10,6 +10,12 @@
             "email": "david.monllao@gmail.com",
             "homepage": "http://moodle.com",
             "role": "Developer"
+        },
+        {
+            "name": "Andrew Nicols",
+            "email": "andrew@nicols.co.uk",
+            "homepage": "http://moodle.com",
+            "role": "Developer"
         }
     ],
     "require": {
