@@ -26,7 +26,7 @@ class WebDriver extends UpstreamDriver
      * @param string    $wdHost The WebDriver host
      * @param array     $moodleParameters Moodle parameters including our non-behat-friendly selenium capabilities
      */
-    public function __construct($browserName = 'firefox', $desiredCapabilities = null, $wdHost = 'http://localhost:4444/wd/hub', $moodleParameters = array()) {
+    public function __construct($browserName = 'chrome', $desiredCapabilities = null, $wdHost = 'http://localhost:4444/wd/hub', $moodleParameters = array()) {
         parent::__construct($browserName, $desiredCapabilities, $wdHost);
 
         // This class is instantiated by the dependencies injection system so
