@@ -51,4 +51,17 @@ class WebDriverFactory extends UpstreamFactory implements DriverFactory {
             $config['wd_host'],
         ]);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCapabilitiesNode()
+    {
+        $node = parent::getCapabilitiesNode();
+
+        // Specify chrome as the default browser.
+        $node->find('browser')->defaultValue('chrome');
+
+        return $node;
+    }
 }
