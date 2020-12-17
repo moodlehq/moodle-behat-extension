@@ -38,6 +38,10 @@ class WebDriverFactory extends UpstreamFactory implements DriverFactory {
         // Merge capabilities
         $extraCapabilities = $config['capabilities']['extra_capabilities'];
         unset($config['capabilities']['extra_capabilities']);
+
+        // Ensure that the capabilites.browser is set correctly.
+        $config['capabilities']['browser'] = $config['browser'];
+
         $capabilities = array_replace($this->guessCapabilities(), $extraCapabilities, $config['capabilities']);
 
         // Build driver definition
