@@ -14,7 +14,6 @@ use Behat\Behat\Tester\ServiceContainer\TesterExtension;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Behat\Behat\EventDispatcher\ServiceContainer\EventDispatcherExtension;
-use Moodle\BehatExtension\Driver\MoodleSelenium2Factory;
 use Behat\Testwork\Suite\ServiceContainer\SuiteExtension;
 use Behat\Behat\Definition\ServiceContainer\DefinitionExtension;
 use Behat\Testwork\Cli\ServiceContainer\CliExtension;
@@ -22,6 +21,7 @@ use Behat\Behat\Definition\Printer\ConsoleDefinitionListPrinter;
 use Behat\Behat\Gherkin\ServiceContainer\GherkinExtension;
 use Behat\Testwork\Output\ServiceContainer\OutputExtension;
 use Behat\Testwork\Specification\ServiceContainer\SpecificationExtension;
+use Moodle\BehatExtension\Driver\WebDriverFactory;
 
 /**
  * Behat extension for moodle
@@ -281,7 +281,7 @@ class BehatExtension implements ExtensionInterface {
      */
     public function initialize(ExtensionManager $extensionManager) {
         if (null !== $minkExtension = $extensionManager->getExtension('mink')) {
-            $minkExtension->registerDriverFactory(new MoodleSelenium2Factory());
+            $minkExtension->registerDriverFactory(new WebDriverFactory());
         }
     }
 
