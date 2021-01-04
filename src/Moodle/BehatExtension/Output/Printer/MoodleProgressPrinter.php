@@ -33,6 +33,7 @@ use Behat\Testwork\Call\CallResult;
 use Behat\Testwork\Hook\Tester\Setup\HookedTeardown;
 use Behat\Testwork\Output\Printer\OutputPrinter;
 use Behat\Testwork\Tester\Result\TestResult;
+use Moodle\BehatExtension\Driver\WebDriver;
 
 /**
  * Prints hooks in a pretty fashion.
@@ -90,14 +91,11 @@ final class MoodleProgressPrinter implements SetupPrinter {
     public function printMoodleInfo($printer) {
         require_once($this->moodledirroot . '/lib/behat/classes/util.php');
 
-        $browser = \Moodle\BehatExtension\Driver\MoodleSelenium2Driver::getBrowser();
+        $browser = WebDriver::getBrowserName();
 
         // Calling all directly from here as we avoid more behat framework extensions.
         $runinfo = \behat_util::get_site_info();
         $runinfo .= 'Server OS "' . PHP_OS . '"' . ', Browser: "' . $browser . '"' . PHP_EOL;
-        if (in_array(strtolower($browser), ['chrome','firefox'])) {
-            $runinfo .= 'Browser specific fixes have been applied. See http://docs.moodle.org/dev/Acceptance_testing#Browser_specific_fixes' .  PHP_EOL;
-        }
         $runinfo .= 'Started at ' . date('d-m-Y, H:i', time());
 
         $printer->writeln($runinfo);
