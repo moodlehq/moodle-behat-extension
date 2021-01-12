@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c5772825c6201687f60ca008da834692",
+    "content-hash": "4253f22deca277a6a07b786dcd3b2398",
     "packages": [
         {
             "name": "behat/behat",
@@ -699,28 +699,30 @@
             "time": "2020-09-30T07:37:11+00:00"
         },
         {
-            "name": "oleg-andreyev/mink-facebook-web-driver",
-            "version": "dev-w3c",
+            "name": "oleg-andreyev/mink-phpwebdriver",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/andrewnicols/MinkPhpWebDriver.git",
-                "reference": "cc659c35e91241271b498d0bb1e1de97472f0e38"
+                "url": "https://github.com/oleg-andreyev/MinkPhpWebDriver.git",
+                "reference": "70c267e7734e6bf7ae9a199d21cf26cc354c515c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/andrewnicols/MinkPhpWebDriver/zipball/cc659c35e91241271b498d0bb1e1de97472f0e38",
-                "reference": "cc659c35e91241271b498d0bb1e1de97472f0e38",
+                "url": "https://api.github.com/repos/oleg-andreyev/MinkPhpWebDriver/zipball/70c267e7734e6bf7ae9a199d21cf26cc354c515c",
+                "reference": "70c267e7734e6bf7ae9a199d21cf26cc354c515c",
                 "shasum": ""
             },
             "require": {
                 "behat/mink": "^1.8",
-                "php": ">=7.0",
+                "php": ">=7.2",
                 "php-webdriver/webdriver": "^1.8"
             },
             "require-dev": {
                 "behat/mink-extension": "^2.3",
                 "ext-json": "*",
-                "mink/driver-testsuite": "dev-integration-branch"
+                "mink/driver-testsuite": "dev-integration-branch",
+                "roave/security-advisories": "dev-master",
+                "symfony/phpunit-bridge": "^5.2"
             },
             "type": "mink-driver",
             "extra": {
@@ -733,34 +735,32 @@
                     "OAndreyev\\Mink\\Driver\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "OAndreyev\\Mink\\Tests\\Driver\\": "tests"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "authors": [
                 {
                     "name": "Oleg Andreyev",
-                    "email": "oleg@andreyev.lv"
+                    "email": "oleg@andreyev.lv",
+                    "role": "Main Developer"
                 }
             ],
-            "description": "MinkFacebookWebDriver driver for Mink framework",
+            "description": "MinkPhpWebDriver driver for Mink framework",
             "keywords": [
+                "W3C",
                 "ajax",
                 "browser",
                 "javascript",
                 "jsonwire",
                 "testing",
-                "w3c",
                 "webdriver"
             ],
             "support": {
-                "source": "https://github.com/andrewnicols/MinkPhpWebDriver/tree/w3c"
+                "issues": "https://github.com/oleg-andreyev/MinkPhpWebDriver/issues",
+                "source": "https://github.com/oleg-andreyev/MinkPhpWebDriver/tree/v1.0.0"
             },
-            "time": "2020-12-07T11:57:57+00:00"
+            "time": "2021-01-16T20:34:52+00:00"
         },
         {
             "name": "php-webdriver/webdriver",
@@ -2820,14 +2820,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "oleg-andreyev/mink-facebook-web-driver": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.0.0"
 }
