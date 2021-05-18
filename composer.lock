@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "16a9ae04976e34cfe7b592cdaf57d616",
+    "content-hash": "b2604a69bc75b24c5718095adf085871",
     "packages": [
         {
             "name": "behat/behat",
@@ -449,16 +449,16 @@
         },
         {
             "name": "friends-of-behat/mink-extension",
-            "version": "v2.5.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/FriendsOfBehat/MinkExtension.git",
-                "reference": "83119aa70be1f2c63061c29dced9d41775cd9db2"
+                "url": "https://github.com/moodlehq/MinkExtension.git",
+                "reference": "586ffcc1dc08ed23fcbc89cb16cb6f72d40499f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfBehat/MinkExtension/zipball/83119aa70be1f2c63061c29dced9d41775cd9db2",
-                "reference": "83119aa70be1f2c63061c29dced9d41775cd9db2",
+                "url": "https://api.github.com/repos/moodlehq/MinkExtension/zipball/586ffcc1dc08ed23fcbc89cb16cb6f72d40499f3",
+                "reference": "586ffcc1dc08ed23fcbc89cb16cb6f72d40499f3",
                 "shasum": ""
             },
             "require": {
@@ -474,6 +474,7 @@
                 "behat/mink-goutte-driver": "^1.1",
                 "phpspec/phpspec": "^6.0 || ^7.0"
             },
+            "default-branch": true,
             "type": "behat-extension",
             "extra": {
                 "branch-alias": {
@@ -485,7 +486,6 @@
                     "Behat\\MinkExtension": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -508,9 +508,9 @@
                 "web"
             ],
             "support": {
-                "source": "https://github.com/FriendsOfBehat/MinkExtension/tree/v2.5.0"
+                "source": "https://github.com/moodlehq/MinkExtension/tree/master"
             },
-            "time": "2021-01-21T09:27:44+00:00"
+            "time": "2021-05-18T13:04:16+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2930,7 +2930,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "friends-of-behat/mink-extension": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

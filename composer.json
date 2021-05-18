@@ -18,10 +18,16 @@
             "role": "Developer"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/moodlehq/MinkExtension.git"
+        }
+    ],
     "require": {
         "php": ">=7.3.0",
         "behat/mink": "~1.8",
-        "friends-of-behat/mink-extension": "~2.5",
+        "friends-of-behat/mink-extension": "dev-master",
         "behat/mink-goutte-driver": "~1.2",
         "symfony/process": "^4.0 || ^5.0",
         "behat/behat": "3.8.*",
