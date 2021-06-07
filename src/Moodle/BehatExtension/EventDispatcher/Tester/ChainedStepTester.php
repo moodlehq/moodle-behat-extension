@@ -25,15 +25,14 @@
 namespace Moodle\BehatExtension\EventDispatcher\Tester;
 
 use Behat\Behat\Tester\Result\ExecutedStepResult;
-use Behat\Behat\Tester\Result\SkippedStepResult;
 use Behat\Behat\Tester\Result\StepResult;
 use Behat\Behat\Tester\StepTester;
-use Behat\Behat\Tester\Result\UndefinedStepResult;
-use Moodle\BehatExtension\Context\Step\Given;
 use Moodle\BehatExtension\Context\Step\ChainedStep;
 use Behat\Gherkin\Node\FeatureNode;
 use Behat\Gherkin\Node\StepNode;
 use Behat\Testwork\Call\CallResult;
+use Behat\Testwork\Tester\Result\ExceptionResult;
+use Behat\Testwork\Tester\Result\TestResult;
 use Behat\Testwork\Environment\Environment;
 use Behat\Testwork\EventDispatcher\TestworkEventDispatcher;
 use Behat\Behat\EventDispatcher\Event\AfterStepSetup;
@@ -41,7 +40,6 @@ use Behat\Behat\EventDispatcher\Event\AfterStepTested;
 use Behat\Behat\EventDispatcher\Event\BeforeStepTeardown;
 use Behat\Behat\EventDispatcher\Event\BeforeStepTested;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Moodle\BehatExtension\Exception\SkippedException;
 
 /**
  * Override step tester to ensure chained steps gets executed.
@@ -101,33 +99,38 @@ class ChainedStepTester implements StepTester {
      * {@inheritdoc}
      */
     public function test(Environment $env, FeatureNode $feature, StepNode $step, $skip) {
+        // The test function always returns either an ExecutedStepResult, which can be either passed, or failed, or a
+        // failed StepResult type such as UndefinedStepResult, SkippedStepResult, or FailedStepSearchResult.
         $result = $this->singlesteptester->test($env, $feature, $step, $skip);
 
-        if (!($result instanceof ExecutedStepResult) || !$this->supportsResult($result->getCallResult())) {
-            $result = $this->checkSkipResult($result);
-
-            // If undefined step then don't continue chained steps.
-            if ($result instanceof UndefinedStepResult) {
-                return $result;
-            }
-
-            // If exception caught, then don't continue chained steps.
-            if (($result instanceof ExecutedStepResult) && $result->hasException()) {
-                return $result;
-            }
-
-            // If step is skipped, then return. no need to continue chain steps.
-            if ($result instanceof SkippedStepResult) {
-                return $result;
-            }
-
-            // Check for exceptions.
-            // Extra step, looking for a moodle exception, a debugging() message or a PHP debug message.
-            $checkingStep = new StepNode('Given', self::EXCEPTIONS_STEP_TEXT, array(), $step->getLine());
-            $afterExceptionCheckingEvent = $this->singlesteptester->test($env, $feature, $checkingStep, $skip);
-            return $this->checkSkipResult($afterExceptionCheckingEvent);
+        // The ExecutedStepResult, and FailedStepSearchResult implement ExceptionResult which has Exception checking.
+        if (($result instanceof ExceptionResult) && $result->hasException()) {
+            // This Result contains an exception. Do not perform chained steps.
+            return $result;
         }
 
+        // All of the Result types implement StepResult, which is a type of TestResult and contains the `isPassed` function.
+        if (($result instanceof TestResult) && !$result->isPassed()) {
+            // This TestResult is already failed. Do not perform chained steps.
+            return $result;
+        }
+
+        // Chaining only supports ExecutedStepResult.
+        $chainingsupported = !($result instanceof ExecutedStepResult);
+
+        // Not all ExecutedStepResult instances can support chaining.
+        $chainingsupported = $chainingsupported &&  $this->supportsResult($result->getCallResult());
+
+        if (!$chainingsupported) {
+            // This StepResult does not support chaining for one of the above reasons.
+            // Add an extra step to look for a moodle exception, a debugging() message or a PHP debug message.
+            $checkingStep = new StepNode('Given', self::EXCEPTIONS_STEP_TEXT, array(), $step->getLine());
+
+            return $this->singlesteptester->test($env, $feature, $checkingStep, $skip);
+        }
+
+        // The existing StepResult is not a failure, does not contain an exception, and supports chaining.
+        // Run the chained steps now.
         return $this->runChainedSteps($env, $feature, $result, $skip);
     }
 
@@ -236,21 +239,6 @@ class ChainedStepTester implements StepTester {
             }
         }
         return $this->checkSkipResult($stepResult);
-    }
-
-    /**
-     * Handle skip exception.
-     *
-     * @param StepResult $result
-     *
-     * @return ExecutedStepResult|SkippedStepResult
-     */
-    private function checkSkipResult(StepResult $result) {
-        if ((method_exists($result, 'getException')) && ($result->getException() instanceof SkippedException)) {
-            return new SkippedStepResult($result->getSearchResult());
-        } else {
-            return $result;
-        }
     }
 
     /**
