@@ -25,6 +25,7 @@
 namespace Moodle\BehatExtension\EventDispatcher\Tester;
 
 use Behat\Behat\Tester\Result\ExecutedStepResult;
+use Behat\Behat\Tester\Result\FailedStepSearchResult;
 use Behat\Behat\Tester\Result\SkippedStepResult;
 use Behat\Behat\Tester\Result\StepResult;
 use Behat\Behat\Tester\StepTester;
@@ -108,6 +109,12 @@ class ChainedStepTester implements StepTester {
 
             // If undefined step then don't continue chained steps.
             if ($result instanceof UndefinedStepResult) {
+                return $result;
+            }
+
+            if ($result instanceof FailedStepSearchResult) {
+                // If unable to find a single step definition then don't continue chained steps.
+                // Note: This happens with ambiguous step definitions.
                 return $result;
             }
 
