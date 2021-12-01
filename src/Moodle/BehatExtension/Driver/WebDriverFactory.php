@@ -62,6 +62,10 @@ class WebDriverFactory extends UpstreamFactory implements DriverFactory {
         // Specify chrome as the default browser.
         $node->find('browser')->defaultValue('chrome');
 
+        // Set the default Marionette value to True.
+        // An empty value here breaks Selenium 4.0 onwards.
+        $node->find('marionette')->defaultTrue();
+
         return $node;
     }
 }
